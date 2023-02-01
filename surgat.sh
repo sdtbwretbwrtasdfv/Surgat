@@ -19,8 +19,6 @@ banner="
 .........._|......\n V:$version SRV MANAGER
 "
 
-
-
 function machine_choose {
 	echo ""
 	echo -ne "Choose the machine: \n"
@@ -99,14 +97,6 @@ function srv_list_service(){
 	args_at_end="sudo lsof -i -P -n | grep LISTEN | grep -v 127.0.0.1"
 	ssh_connect_run
 }
-function forward_srv_to_arm(){
-	echo "Provide port at SRV you want to forward to ARM:"
-		read port_remote
-	echo "Provide local ARM port to use:"
-		read port_local
-	args_at_start="-M -S my-socket-name -fNT -L $port_local:0.0.0.0:$port_remote"
-	ssh_connect_run
-}
 function list_arm_fwds(){
 	echo""
 	echo -e "${BLUE}You set up the following local port forwardings:${YELLOW}"
@@ -120,16 +110,78 @@ function list_arm_fwds(){
 function socat_fwd_on_srv_tcp(){
 	echo "Provide local port on SRV:"
 		lcl_prt
-	echo "Provide remote server where to fork traffic:"
+	echo "Provide remote server from where to fork traffic:"
 		frk_srv
 	echo "Provide remote server port where to fork traffic:"
 		frk_srv_prt
 	args_at_end="socat TCP-LISTEN:$lcl_prt,fork TCP:$frk_srv:$frk_srv_prt"
 	ssh_connect_run
 }
+function forward_srv_to_arm(){
+	echo "Provide port at SRV you want to forward to ARM:"
+		read port_remote
+	echo "Provide local ARM port to use:"
+		read port_local
+	read -p "Background ssh session? (y/n)" choice
+	case "$choice" in
+	  y|Y ) args_at_start="-M -S my-socket-name -fNT -L $port_local:0.0.0.0:$port_remote";;
+	  n|N ) args_at_start="-M -S my-socket-name -L $port_local:0.0.0.0:$port_remote";;
+	  * ) echo "invalid";;
+	esac
+	ssh_connect_run
+}
+function forward_arm_to_srv(){
+	echo "Provide port on ARM you want to forward to SRV:"
+		read port_local
+	echo "Provide SRV port to use:"
+		read port_remote
+	read -p "Background ssh session? (y/n)" choice
+	case "$choice" in
+	  y|Y ) args_at_start="-M -S my-socket-name -fNT -R $port_remote:0.0.0.0:$port_local";;
+	  n|N ) args_at_start="-M -S my-socket-name -R $port_remote:0.0.0.0:$port_local";;
+	  * ) echo "invalid";;
+	esac
+	read -p "Add UFW rule on SRV to accept connections to port? (y/n)" choice
+	case "$choice" in
+	  y|Y ) args_at_end="ufw allow "$port_remote" && ufw reload" && ssh_connect_run;;
+	  n|N ) nop=nop;;
+	  * ) echo "invalid";;
+	esac
+	ssh_connect_run
+}
+function list_users(){
+	args_at_end="awk -F: '{ print \$1}' /etc/passwd"
+	ssh_connect_run
+}
+function list_fw(){
+	args_at_end="ufw status numbered"
+	ssh_connect_run
+}
+function allow_port_fw(){
+	echo "What port to open?"
+		read port_to_open
+	args_at_end="ufw allow $port_to_open && ufw reload && ufw status numbered"
+	ssh_connect_run
+}
+function disallow_port_fw(){
+	echo "What port to open?"
+		read port_to_open
+	args_at_end="ufw deny $port_to_open && ufw reload && ufw status numbered"
+	ssh_connect_run
+}
+function del_rule_fw(){
+	args_at_end="ufw status numbered"
+	ssh_connect_run
+	echo "What rule to del?"
+		read rule_to_del
+	args_at_end="ufw delete "$rule_to_del
+	echo -e ${BLUE}
+	ssh $args_at_start ${users[$chosen_machine_array_number]}@${ips[$chosen_machine_array_number]} -p ${ports[$chosen_machine_array_number]} -i $keys_dir/${users[$chosen_machine_array_number]}@${ips[$chosen_machine_array_number]} $args_at_end
+	echo -e ${NC}
+}
 
 function ssh_menu(){
-	options=("Connect" "Add machine" "Delete machine" "List services at SRV" "Stop service at SRV" "FWD port from SRV to ARM" "List ARM FWDs" "Socat FWD TCP on SRV                         ")
+	options=("ADM. Connect" "ADM. Add machine" "ADM. Delete machine" "SRVCS. List services at SRV" "SRVCS. Stop service at SRV by port" "FWD. Forward port from SRV to ARM" "FWD. Forward port from ARM to SRV" "FWD. Forward port from another server to SRV (socat)" "FWD. List ARM FWDs" "USRS. List Users on SRV" "FW. List rules on SRV" "FW. Allow port on SRV" "FW. Deny port on SRV" "FW. Del fw rule on SRV")
 	echo "$title"
 	PS10="$prompt "
 	select opt in "${options[@]}"; do
@@ -140,8 +192,15 @@ function ssh_menu(){
 	    4 ) srv_list_service; break;;
 	    5 ) srv_stop_service; break;;
 	    6 ) forward_srv_to_arm; break;;
-	    7 ) list_arm_fwds; break;;
-	    7 ) socat_fwd_on_srv_tcp; break;;
+	    7 ) forward_arm_to_srv; break;;
+	    8 ) socat_fwd_on_srv_tcp; break;;
+	    9 ) list_arm_fwds; break;;
+	    10 ) list_users; break;;
+	    11 ) list_fw; break;;
+	    12 ) allow_port_fw; break;;
+	    13 ) disallow_port_fw; break;;
+	    14 ) del_rule_fw; break;;
+
 	    $(( ${#options[@]}+1 )) ) echo "Invalid option. Try another one.";continue;;
 	    *) echo "Invalid option. Try another one.";continue;;
 	    esac
