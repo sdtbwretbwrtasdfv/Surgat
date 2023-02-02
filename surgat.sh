@@ -179,9 +179,11 @@ function del_rule_fw(){
 	ssh $args_at_start ${users[$chosen_machine_array_number]}@${ips[$chosen_machine_array_number]} -p ${ports[$chosen_machine_array_number]} -i $keys_dir/${users[$chosen_machine_array_number]}@${ips[$chosen_machine_array_number]} $args_at_end
 	echo -e ${NC}
 }
-
+function wipe_db(){
+	rm -rf ./Database
+}
 function ssh_menu(){
-	options=("ADM. Connect" "ADM. Add machine" "ADM. Delete machine" "SRVCS. List services at SRV" "SRVCS. Stop service at SRV by port" "FWD. Forward port from SRV to ARM" "FWD. Forward port from ARM to SRV" "FWD. Forward port from another server to SRV (socat)" "FWD. List ARM FWDs" "USRS. List Users on SRV" "FW. List rules on SRV" "FW. Allow port on SRV" "FW. Deny port on SRV" "FW. Del fw rule on SRV")
+	options=("ADM. Connect" "ADM. Add machine" "ADM. Delete machine" "ADM. Wipe DB" "SRVCS. List services at SRV" "SRVCS. Stop service at SRV by port" "FWD. Forward port from SRV to ARM" "FWD. Forward port from ARM to SRV" "FWD. Forward port from another server to SRV (socat)" "FWD. List ARM FWDs" "USRS. List Users on SRV" "FW. List rules on SRV" "FW. Allow port on SRV" "FW. Deny port on SRV" "FW. Del fw rule on SRV")
 	echo "$title"
 	PS10="$prompt "
 	select opt in "${options[@]}"; do
@@ -189,17 +191,19 @@ function ssh_menu(){
 	    1 ) ssh_connect; break;;
 	    2 ) ssh_add; break;;
 	    3 ) ssh_delete; break;;
-	    4 ) srv_list_service; break;;
-	    5 ) srv_stop_service; break;;
-	    6 ) forward_srv_to_arm; break;;
-	    7 ) forward_arm_to_srv; break;;
-	    8 ) socat_fwd_on_srv_tcp; break;;
-	    9 ) list_arm_fwds; break;;
-	    10 ) list_users; break;;
-	    11 ) list_fw; break;;
-	    12 ) allow_port_fw; break;;
-	    13 ) disallow_port_fw; break;;
-	    14 ) del_rule_fw; break;;
+	    4 ) wipe_db; break;;
+
+	    5 ) srv_list_service; break;;
+	    6 ) srv_stop_service; break;;
+	    7 ) forward_srv_to_arm; break;;
+	    8 ) forward_arm_to_srv; break;;
+	    9 ) socat_fwd_on_srv_tcp; break;;
+	    10 ) list_arm_fwds; break;;
+	    11 ) list_users; break;;
+	    12 ) list_fw; break;;
+	    13 ) allow_port_fw; break;;
+	    14 ) disallow_port_fw; break;;
+	    15 ) del_rule_fw; break;;
 
 	    $(( ${#options[@]}+1 )) ) echo "Invalid option. Try another one.";continue;;
 	    *) echo "Invalid option. Try another one.";continue;;

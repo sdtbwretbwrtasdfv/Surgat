@@ -12,7 +12,7 @@
 ⠀⠀⠀⠀⠀⠀⠄⣠⣻⣱⣿⣿⣿⣿⡿⢫⣿⣿⣻⣿⣧⣻⣦⡠⠄⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠉⠁⢀⠯⠋⡜⣯⣿⠟⢷⣼⢻⢿⣿⢹⡈⠫⢄⠈⠉⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠐⠁⠀⠉⡩⠃⢸⢃⠜⠛⠀⠊⠈⠫⠊⠁⠈⠐⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⠀⠜⠀⠀⠀⠀⠙⠀⠀⠈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⠀⠜⠀⠀⠀⠀⠙⠀⠀⠈⠀⠀⠀⠀⠀⠀⠀⠀⠀
 # What it can do?
  1) ADM. Connect - Create simple ssh session on host where key was added
  2) ADM. Add machine - Add key to machine + add machine to DB
