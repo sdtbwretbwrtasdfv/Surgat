@@ -1,6 +1,8 @@
 #!/bin/bash
 version="1.0"
-ssh_dir="Database"
+SCRIPTDIR=$(dirname "$(readlink -f "$0")")
+
+ssh_dir=$SCRIPTDIR"/Database"
 keys_dir=$ssh_dir/keys
 machines_file=$ssh_dir/machines
 notes_dir=$ssh_dir/notes
@@ -183,6 +185,8 @@ function wipe_db(){
 	rm -rf ./Database
 }
 function ssh_menu(){
+
+echo $SCRIPTDIR
 	options=("ADM. Connect" "ADM. Add machine" "ADM. Delete machine" "ADM. Wipe DB" "SRVCS. List services at SRV" "SRVCS. Stop service at SRV by port" "FWD. Forward port from SRV to ARM" "FWD. Forward port from ARM to SRV" "FWD. Forward port from another server to SRV (socat)" "FWD. List ARM FWDs" "USRS. List Users on SRV" "FW. List rules on SRV" "FW. Allow port on SRV" "FW. Deny port on SRV" "FW. Del fw rule on SRV")
 	echo "$title"
 	PS10="$prompt "
