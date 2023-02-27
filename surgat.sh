@@ -1,5 +1,5 @@
 #!/bin/bash
-version="1.0"
+version="1.1"
 SCRIPTDIR=$(dirname "$(readlink -f "$0")")
 
 ssh_dir=$SCRIPTDIR"/Database"
